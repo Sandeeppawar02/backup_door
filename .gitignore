@@ -30,3 +30,4 @@ Thumbs.db
 src/stripe/controller.js
 src/utils/aws.js
 .env
+
