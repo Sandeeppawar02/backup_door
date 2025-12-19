@@ -1,0 +1,32 @@
+# Node
+node_modules/
+
+# Environment variables
+.env
+
+# Uploads & generated files
+uploads/
+*.log
+
+# Archives
+*.tar
+*.zip
+*.rar
+
+# Keys (VERY IMPORTANT)
+*.ppk
+*.pem
+*.key
+
+
+src/stripe/*.js
+src/utils/*.js
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Ignore secrets
+src/stripe/controller.js
+src/utils/aws.js
+.env
