@@ -1,0 +1,206 @@
+# **GitHub Repository Management Guide (Windows)**
+
+---
+
+## **1. Setting Up a Fresh Repository**
+
+1. Open CMD or Git Bash in your project folder:
+
+```cmd
+cd F:\OSL_new\OSL
+```
+
+2. Remove old Git history (if starting fresh):
+
+```cmd
+rmdir /s /q .git
+```
+
+3. Initialize Git:
+
+```cmd
+git init
+git branch -M main
+```
+
+---
+
+## **2. Set Up `.gitignore`**
+
+Create a `.gitignore` file to prevent committing:
+
+```gitignore
+# Node modules
+node_modules/
+
+# Environment files (secrets)
+.env
+
+# Uploads and logs
+uploads/
+*.log
+
+# Archives
+*.tar
+*.zip
+*.rar
+
+# Secret keys
+*.ppk
+*.pem
+*.key
+
+# Specific sensitive project files
+src/stripe/controller.js
+src/utils/aws.js
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+```
+
+Add and commit `.gitignore`:
+
+```cmd
+git add .gitignore
+git commit -m "Add .gitignore to ignore secrets and OS files"
+```
+
+---
+
+## **3. Track Large Files with Git LFS (Optional)**
+
+If your project has large binary files (e.g., `.bin`):
+
+```cmd
+git lfs install
+git lfs track "*.bin"
+git add .gitattributes
+git commit -m "Track large .bin files with Git LFS"
+```
+
+---
+
+## **4. Add Project Files & Commit**
+
+```cmd
+git add .
+git commit -m "Initial commit - cleaned repo"
+```
+
+> ⚠️ Make sure no secrets are included in commits.
+
+---
+
+## **5. Add Remote Repository**
+
+```cmd
+git remote add origin https://github.com/USERNAME/REPO_NAME.git
+```
+
+Replace `USERNAME` and `REPO_NAME` with your GitHub account and repo.
+
+---
+
+## **6. Force Push (if starting fresh or cleaning history)**
+
+```cmd
+git push -u origin main --force
+```
+
+> Note: Force push **overwrites history** on GitHub. Only use if you want to replace the remote entirely.
+
+---
+
+## **7. Handling GitHub Push Protection Errors**
+
+If you get errors like:
+
+```
+GH013: Repository rule violations found
+Push cannot contain secrets
+```
+
+**Steps to fix:**
+
+1. **Remove secret files from Git tracking:**
+
+```cmd
+git rm --cached src/stripe/controller.js
+git rm --cached src/utils/aws.js
+git rm --cached .env
+```
+
+2. Commit the removal:
+
+```cmd
+git commit -m "Remove secret files from tracking"
+```
+
+3. Push again:
+
+```cmd
+git push origin main --force
+```
+
+> GitHub scan will then pass, because sensitive files are no longer tracked.
+
+---
+
+## **8. Handling Large File Errors (Over 100 MB)**
+
+* GitHub blocks files >100 MB. For files >50 MB, warnings appear.
+* Use **Git LFS** for large files:
+
+```cmd
+git lfs install
+git lfs track "*.bin"
+git add .gitattributes
+git add <large-files>
+git commit -m "Add large files via Git LFS"
+git push origin main
+```
+
+* Alternatively, remove large files from history using **BFG Repo Cleaner**:
+
+```cmd
+java -jar path\to\bfg.jar --strip-blobs-bigger-than 100M
+git reflog expire --expire=now --all
+git gc --prune=now --aggressive
+git push origin main --force
+```
+
+---
+
+## **9. Switching to Token-Based Authentication (Required)**
+
+GitHub no longer supports password authentication for HTTPS.
+
+1. Generate a **Personal Access Token**:
+
+   * Go to: [GitHub Tokens](https://github.com/settings/tokens)
+   * Select scopes: `repo` and `workflow` (or full repo access)
+2. Use the token instead of your password:
+
+```cmd
+git push https://USERNAME:TOKEN@github.com/USERNAME/REPO_NAME.git
+```
+
+> Store your token in Git credential manager for convenience.
+
+---
+
+## **10. Best Practices for the Future**
+
+* Never commit API keys or `.env` files.
+* Always use `.gitignore` for secrets, logs, and temporary files.
+* Use Git LFS for files over 50 MB.
+* Before pushing, review changes:
+
+```cmd
+git status
+git diff
+```
+
+* For large repo cleanups, use **BFG Repo Cleaner** or **git-filter-repo** (requires Python).
+
